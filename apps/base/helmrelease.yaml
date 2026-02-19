@@ -1,0 +1,29 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: disentangle
+  namespace: disentangle
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: disentangle
+      version: ">=0.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: disentangle
+        namespace: flux-system
+  values:
+    image:
+      repository: ghcr.io/disentangle-network/disentangle-node
+      tag: v0.4.0
+    nodes:
+      count: 3
+    persistence:
+      enabled: true
+  valuesFrom:
+    - kind: ConfigMap
+      name: cluster-settings
+      valuesKey: values.yaml
+      optional: true

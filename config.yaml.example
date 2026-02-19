@@ -1,0 +1,32 @@
+# launch CLI configuration
+# Copy to ~/.config/launch/config.yaml and fill in your values.
+
+# OCI (optional -- only if deploying to Oracle Cloud)
+oci_region: us-phoenix-1
+oci_compartment_id: ""
+
+# Cloudflare
+cloudflare_account_id: ""
+cloudflare_api_token: ""  # Zone:DNS:Edit, Zone:Zone:Read/Edit, Zone:Zone Settings:Edit
+domain: disentangle.network
+
+# GitHub
+github_org: ""
+github_user: ""
+
+# Local repo paths (set by launch setup)
+repos:
+  oci_tf_bootstrap: ""
+  k8s_oci_foundation: ""
+  genesis_operator: ""
+  deploy: ""
+
+# Cluster
+cluster_name: ""
+environment: dev
+
+# Images
+protocol_image: ghcr.io/disentangle-network/disentangle-node
+protocol_version: v0.4.0
+genesis_image: ghcr.io/larsenclose/genesis-operator
+genesis_version: 0.1.0

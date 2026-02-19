@@ -1,0 +1,4 @@
+creation_rules:
+  # Per-cluster secrets encrypted with cluster-specific age key
+  - path_regex: secrets/.*/.*\.yaml$
+    age: "" # Set by: launch secrets init --cluster <name>
