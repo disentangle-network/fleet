@@ -10,16 +10,9 @@ GitOps deployment template for running Disentangle Network nodes across one or m
 - [age](https://github.com/FiloSottile/age) + [sops](https://github.com/getsops/sops)
 - [launch](https://github.com/disentangle-network/launch) (`brew install disentangle-network/tap/launch`)
 
-For OCI Always Free deployments, also install:
-- [oci-cli](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm)
-- [OpenTofu](https://opentofu.org/docs/intro/install/)
-- [oci-tf-bootstrap](https://github.com/LarsenClose/oci-tf-bootstrap) (`brew install disentangle-network/tap/oci-tf-bootstrap`)
-
 ## Quick Start
 
-### 1. Use this template
-
-Click **"Use this template"** on GitHub, or:
+### 1. Create your fleet repo from this template
 
 ```bash
 gh repo create my-org/fleet --template disentangle-network/fleet --private --clone
@@ -32,77 +25,103 @@ cd fleet
 launch setup
 ```
 
-This walks you through OCI, Cloudflare, GitHub, and SOPS age key configuration.
+### 3. Get a Kubernetes cluster
 
-### 3. Add your clusters
+Choose any path to a running cluster with a kubeconfig:
+
+<details>
+<summary><strong>Option A: OCI Always Free</strong></summary>
+
+Provision a free ARM-based OKE cluster on Oracle Cloud:
 
 ```bash
-# OCI Always Free cluster (provisioned by launch)
-launch cluster add oci-dev --infra cloud --arch arm64 --resources medium --nodes 3
-
-# Existing clusters (Talos, k3s, managed K8s, etc.)
-launch cluster add my-cluster --infra bare-metal --arch arm64 --resources small --nodes 3
+brew install disentangle-network/tap/oci-tf-bootstrap
 ```
 
-### 4. Initialize secrets
+Clone and configure the infrastructure repo:
+
+```bash
+git clone https://github.com/LarsenClose/k8s-oci-foundation.git
+cd k8s-oci-foundation
+
+# Discover OCI resources and generate Terraform
+oci-tf-bootstrap --always-free --output terraform-output
+
+# Configure
+cp environments/dev/terraform.tfvars.example environments/dev/terraform.tfvars
+# Edit terraform.tfvars with your OCI and Cloudflare settings
+
+# Review and apply
+task init
+task plan     # Review the plan
+task apply    # Provision VCN, OKE cluster, ARM node pools
+```
+
+Your kubeconfig will be at `./kubeconfig`.
+
+</details>
+
+<details>
+<summary><strong>Option B: Talos Linux (via Sidero Omni or bare metal)</strong></summary>
+
+Follow the [Talos documentation](https://www.talos.dev/latest/introduction/getting-started/) to create a cluster. Your `talosconfig` and `kubeconfig` will be generated during the process.
+
+</details>
+
+<details>
+<summary><strong>Option C: Any existing Kubernetes cluster</strong></summary>
+
+Any cluster works -- k3s, EKS, GKE, AKS, kind, minikube. You just need a kubeconfig with cluster-admin access.
+
+</details>
+
+### 4. Add clusters to the fleet
+
+```bash
+cd fleet
+
+# Add each cluster
+launch cluster add oci-dev --infra cloud --arch arm64 --resources medium --nodes 3
+launch cluster add my-talos --infra bare-metal --arch arm64 --resources small --nodes 3
+```
+
+### 5. Initialize secrets
 
 ```bash
 launch secrets init --cluster oci-dev --provider age
-launch secrets init --cluster my-cluster --provider age
-```
-
-### 5. Provision infrastructure (OCI only)
-
-```bash
-launch infra plan     # Review the plan
-launch infra apply    # Provision VCN, OKE cluster, node pools
+launch secrets init --cluster my-talos --provider age
 ```
 
 ### 6. Bootstrap FluxCD
 
 ```bash
 launch bootstrap --cluster oci-dev
-launch bootstrap --cluster my-cluster
+launch bootstrap --cluster my-talos
 ```
 
-FluxCD will reconcile this repo and deploy disentangle-node pods to each cluster.
+FluxCD reconciles this repo and deploys disentangle-node pods to each cluster.
 
 ### 7. Verify
 
 ```bash
 launch status
-kubectl --context oci-dev get pods -n disentangle
 ```
 
 ## Repository Structure
 
 ```
-clusters/           # Per-cluster FluxCD Kustomizations (created by launch cluster add)
+clusters/              Per-cluster FluxCD Kustomizations (created by launch cluster add)
 apps/
-  base/             # HelmRelease for disentangle-node
-  disentangle/      # App overlay (inherits from base)
+  base/                HelmRelease for disentangle-node
+  disentangle/         App overlay (inherits from base)
 infrastructure/
-  controllers/      # Ingress, cert-manager, external-dns
-  configs/          # ClusterIssuers, NetworkPolicies
-  secrets/          # SOPS-encrypted infrastructure secrets
-secrets/            # Per-cluster SOPS-encrypted secrets
-config.yaml.example # launch CLI config template
-.sops.yaml          # SOPS encryption rules
+  controllers/         Ingress, cert-manager, external-dns
+  configs/             ClusterIssuers, NetworkPolicies
+  secrets/             SOPS-encrypted infrastructure secrets
+secrets/               Per-cluster SOPS-encrypted secrets
+config.yaml.example    launch CLI config template
+.sops.yaml             SOPS encryption rules
 ```
-
-## Customization
-
-### Node count and resources
-
-Edit `clusters/<name>/cluster-settings.yaml` or pass values during `launch cluster add`:
-
-```bash
-launch cluster add my-cluster --nodes 5 --resources large
-```
-
-### Adding infrastructure controllers
-
-Uncomment and configure resources in `infrastructure/controllers/kustomization.yaml`.
 
 ## Links
 
