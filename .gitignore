@@ -2,6 +2,9 @@
 *.agekey
 age.key
 
+# Cluster overlays (private deployment data — lives in fleet-deploy repo)
+clusters/
+
 # Terraform
 .terraform/
 *.tfstate
