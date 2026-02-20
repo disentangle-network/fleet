@@ -1,5 +1,8 @@
 # Disentangle Network Fleet
 
+[![CI](https://github.com/disentangle-network/fleet/actions/workflows/ci.yml/badge.svg)](https://github.com/disentangle-network/fleet/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
 GitOps deployment template for running Disentangle Network nodes across one or more Kubernetes clusters.
 
 ## Prerequisites

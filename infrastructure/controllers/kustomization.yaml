@@ -1,8 +1,8 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: []
-# Add infrastructure controllers as needed:
-#   - ingress-nginx.yaml
-#   - cert-manager.yaml
-#   - external-dns.yaml
+resources:
+  - namespace-security.yaml
+  - cert-manager-repo.yaml
+  - cert-manager.yaml
+  - network-policies.yaml
