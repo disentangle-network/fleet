@@ -40,8 +40,7 @@ spec:
       ports:
         - protocol: TCP
           port: 9000
-    - to: {}
-      ports:
+    - ports:
         - protocol: UDP
           port: 53
         - protocol: TCP
