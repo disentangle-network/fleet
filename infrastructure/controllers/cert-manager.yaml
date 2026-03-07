@@ -22,7 +22,5 @@ spec:
   values:
     installCRDs: true
     replicaCount: 1
-    podSecurityPolicy:
-      enabled: false
     securityContext:
       runAsNonRoot: true
