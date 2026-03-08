@@ -1,0 +1,49 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: disentangle
+  namespace: disentangle
+spec:
+  chart:
+    spec:
+      version: ">=0.4.0"
+  values:
+    nodes:
+      count: 3
+    persistence:
+      enabled: false
+    pow:
+      difficulty: 4
+      mineIntervalSecs: 5
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    nebula:
+      enabled: true
+      image:
+        tag: "1.11.0-pq.4"
+      mode: node
+      certMount:
+        mode: shared
+      certSecretName: nebula-certs
+      tun:
+        disabled: false
+      lighthouseHosts:
+        - "10.42.1.1"
+        - "10.42.1.2"
+      staticHostMap:
+        "10.42.1.1": "129.153.68.77:4242"
+        "10.42.1.2": "137.131.8.176:4242"
+      staticMap:
+        cadence: 30s
+        network: ip4
+      relay:
+        enabled: false
+        relays:
+          - "10.42.1.1"
+          - "10.42.1.2"

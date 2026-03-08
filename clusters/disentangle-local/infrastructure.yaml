@@ -1,14 +1,12 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: oci-dev-apps
+  name: disentangle-local-infrastructure
   namespace: flux-system
 spec:
   interval: 5m
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./apps/disentangle-oci-dev
+  path: ./infrastructure/controllers
   prune: true
-  dependsOn:
-    - name: oci-dev-infrastructure

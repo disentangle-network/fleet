@@ -14,5 +14,5 @@ data:
   cpu_request: "100m"
   memory_request: "128Mi"
   pow_difficulty: "8"
-  nebula_mode: "disabled"
+  nebula_mode: "lighthouse"
   nebula_prefix: "10.42.0"
